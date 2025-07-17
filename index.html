@@ -50,6 +50,7 @@
   </button>
 
   <script>
+    window.addEventListener('DOMContentLoaded', function () {
   let fetchInterval = null;
 
   document.getElementById("view-report-btn").addEventListener("click", function () {
@@ -137,6 +138,7 @@
     document.getElementById("input-email").value = "";
     document.getElementById("auth-error").textContent = "";
   });
+       });
 </script>
 
 
