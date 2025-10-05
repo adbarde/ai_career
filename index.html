@@ -48,48 +48,98 @@
   <button id="hide-report-btn" style="display: none; margin: 20px auto; display: block; padding: 10px 20px; font-size: 1rem; background-color: var(--button-bg); color: white; border: none; border-radius: 8px; cursor: pointer;">
     🔒 Hide My Report
   </button>
-<script>
-function getCareerReport(name, email) {
-  const errorBox = document.getElementById("auth-error");
 
-  // Remove previous script if exists
-  const oldScript = document.getElementById("jsonp-script");
-  if (oldScript) oldScript.remove();
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+  let fetchInterval = null;
 
-  // JSONP callback function
-  window.handleCareerReport = function(data) {
-    if (data.error || !data.Name || !data.Email) {
-      errorBox.textContent = "❌ No matching report found. Please check your name and email.";
+  document.getElementById("view-report-btn").addEventListener("click", function () {
+    const nameInput = document.getElementById("input-name").value.trim().toLowerCase();
+    const emailInput = document.getElementById("input-email").value.trim().toLowerCase();
+    const errorBox = document.getElementById("auth-error");
+
+    if (!nameInput || !emailInput) {
+      errorBox.textContent = "⚠️ Please enter both name and email.";
       return;
     }
 
-    errorBox.textContent = "";
-    document.getElementById("auth-section").style.display = "none";
-    showReport(data);
-  };
+    // Fetch matching report
+    fetch(`https://script.google.com/macros/s/AKfycbzx93EOp2U__QaV-RAZHutm2TtMqDk_0eXjaw3tHNgPoLHorEnQsqw86X0Fok7SW2TI/exec?name=${encodeURIComponent(nameInput)}&email=${encodeURIComponent(emailInput)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error || !data["Name"] || !data["Email"]) {
+          errorBox.textContent = "❌ No matching report found. Please check your name and email.";
+          return;
+        }
 
-  // Create script tag to fetch JSONP
-  const script = document.createElement("script");
-  script.id = "jsonp-script";
-  script.src = `https://script.google.com/macros/s/AKfycbxc5Iu7IVYZOrgbqWMrQ9s3HbXwE0L2oeUg1yT4lwMHXwn_dr6q4LlscBRyBw_1Xru3/exec?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&callback=handleCareerReport`;
-  document.body.appendChild(script);
-}
+        errorBox.textContent = "";
+        document.getElementById("auth-section").style.display = "none";
+        showReport(data);
+      })
+      .catch(error => {
+        errorBox.textContent = "❌ Failed to fetch report.";
+        console.error("Fetch error:", error);
+      });
+  });
 
-// Event listener
-document.getElementById("view-report-btn").addEventListener("click", function() {
-  const name = document.getElementById("input-name").value.trim();
-  const email = document.getElementById("input-email").value.trim();
-  const errorBox = document.getElementById("auth-error");
+  function showReport(data) {
+    const card = document.getElementById("career-card");
+    card.style.display = "block";
+    card.innerHTML = `
+      <h2>📇 Career Identity Card</h2>
+      <div class="section"><strong>👤 Name:</strong> ${data["Name"]}</div>
+      <div class="section"><strong>🎓 Education Level:</strong> ${data["Education Level"]}</div>
 
-  if (!name || !email) {
-    errorBox.textContent = "⚠️ Please enter both name and email.";
-    return;
+      <div class="section-title">🎯 Top 2 RIASEC Types</div>
+      <div class="section">1. <strong>${data["riasec_type_1"]}</strong> – ${data["riasec_type_1_explanation"]}</div>
+      <div class="section">2. <strong>${data["riasec_type_2"]}</strong> – ${data["riasec_type_2_explanation"]}</div>
+
+      <div class="section-title">🧠 Personality Summary</div>
+      <div class="section"><strong>Openness:</strong> ${data["openness_summary"]}</div>
+      <div class="section"><strong>Conscientiousness:</strong> ${data["conscientiousness_summary"]}</div>
+      <div class="section"><strong>Extraversion:</strong> ${data["extraversion_summary"]}</div>
+      <div class="section"><strong>Agreeableness:</strong> ${data["agreeableness_summary"]}</div>
+      <div class="section"><strong>Neuroticism:</strong> ${data["neuroticism_summary"]}</div>
+
+      <div class="section-title">💡 Top Motivators</div>
+      <div class="section">🚀 <strong>${data["motivator_1"]}</strong> – ${data["motivator_1_description"]}</div>
+      <div class="section">🎖️ <strong>${data["motivator_2"]}</strong> – ${data["motivator_2_description"]}</div>
+
+      <div class="section-title">🛠️ Skills & Readiness</div>
+      <div class="section"><strong>Technical Skills:</strong> ${data["technical_skills"]}</div>
+      <div class="section"><strong>Soft Skills:</strong> ${data["soft_skills"]}</div>
+      <div class="section">🔍 Best Fit Context: ${data["Skills Summary"]}</div>
+
+      <div class="section-title">💼 Career Matches</div>
+      <div class="section">✅ ${data["career_1"]} – ${data["career_1_explanation"]}</div>
+
+      <div class="section-title">📚 Learning Suggestions</div>
+      <div class="section">📘 ${data["course_1"]} – ${data["course_1_reason"]}</div>
+    `;
+
+    document.getElementById("hide-report-btn").style.display = "block";
+
+    // Optional: auto-refresh logic can be disabled or enabled
+    fetchInterval = setInterval(() => showReport(data), 10000);
   }
 
-  getCareerReport(name, email);
-});
-</script>
+  // Hide button logic
+  document.getElementById("hide-report-btn").addEventListener("click", function () {
+    clearInterval(fetchInterval);
 
+    // Hide the report and reset the view
+    document.getElementById("career-card").style.display = "none";
+    document.getElementById("career-card").innerHTML = "";
+    this.style.display = "none";
+
+    // Show authentication section again
+    document.getElementById("auth-section").style.display = "block";
+    document.getElementById("input-name").value = "";
+    document.getElementById("input-email").value = "";
+    document.getElementById("auth-error").textContent = "";
+  });
+       });
+</script>
 
 
 </body>
