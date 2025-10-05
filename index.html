@@ -65,25 +65,22 @@
 
     // Fetch matching report
     fetch(`https://script.google.com/macros/s/AKfycby-w-trnf0x4QcpwjuhWInblfhHYF0ZhiLNBUQjBO7fd6kr5U41Q0Dr4we9wARdHlir/exec?name=${encodeURIComponent(nameInput)}&email=${encodeURIComponent(emailInput)}`)
-  .then(response => {
-    if (!response.ok) throw new Error("Network response was not ok");
-    return response.json();
-  })
-  .then(data => {
-    if (data.error || !data["Name"] || !data["Email"]) {
-      errorBox.textContent = "❌ No matching report found. Please check your name and email.";
-      return;
-    }
+      .then(response => response.json())
+      .then(data => {
+        if (data.error || !data["Name"] || !data["Email"]) {
+          errorBox.textContent = "❌ No matching report found. Please check your name and email.";
+          return;
+        }
 
-    errorBox.textContent = "";
-    document.getElementById("auth-section").style.display = "none";
-    showReport(data);
-  })
-  .catch(error => {
-    errorBox.textContent = "❌ Failed to fetch report. Please check your internet or try again.";
-    console.error("Fetch error:", error);
+        errorBox.textContent = "";
+        document.getElementById("auth-section").style.display = "none";
+        showReport(data);
+      })
+      .catch(error => {
+        errorBox.textContent = "❌ Failed to fetch report.";
+        console.error("Fetch error:", error);
+      });
   });
-
 
   function showReport(data) {
     const card = document.getElementById("career-card");
@@ -123,7 +120,7 @@
     document.getElementById("hide-report-btn").style.display = "block";
 
     // Optional: auto-refresh logic can be disabled or enabled
-    //fetchInterval = setInterval(() => showReport(data), 10000);
+    fetchInterval = setInterval(() => showReport(data), 10000);
   }
 
   // Hide button logic
