@@ -64,7 +64,7 @@
     }
 
     // Fetch matching report
-    fetch(`https://script.google.com/macros/s/AKfycbzVyXktD27DhKhqM_Wb3E5qCnoUUHpH7KnVXFW22KaFvsrONIAPkBXgxjdKQMEDcZkp/exec?name=${encodeURIComponent(nameInput)}&email=${encodeURIComponent(emailInput)}`)
+    fetch(`https://script.google.com/macros/s/AKfycbzamUnnfLq9V2EMNcLIl92I_UofA3AGwKRT-e8t1zcfoR0FHyl-pJymMWJVddyam9nW/exec?name=${encodeURIComponent(nameInput)}&email=${encodeURIComponent(emailInput)}`)
       .then(response => response.json())
       .then(data => {
         if (data.error || !data["Name"] || !data["Email"]) {
@@ -144,3 +144,4 @@
 
 </body>
 </html>
+
